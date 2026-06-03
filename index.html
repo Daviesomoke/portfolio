@@ -6,6 +6,8 @@
 
 
 
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,20 +19,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      background: #0b0c0f;
-      color: #f0f2f5;
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      line-height: 1.5;
-      display: block;
-      min-height: 100vh;
-    }
+    /* ----- CSS Variables & Reset ----- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
       --bg: #0b0c0f;
@@ -40,486 +30,321 @@
       --text-secondary: #9aa0ab;
       --text-muted: #606770;
       --accent: #5b9bd5;
+      --accent-glow: rgba(91, 155, 213, 0.25);
       --border: #2a2d34;
+      --terminal-green: #7aa2f7;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+      --transition: 0.25s ease;
+      --radius: 12px;
     }
 
+    html { scroll-behavior: smooth; background: var(--bg); }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+    /* Scroll progress bar */
     #progress-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 3px;
-      background: #5b9bd5;
-      width: 0%;
-      z-index: 999;
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: var(--accent); width: 0%; z-index: 999;
       transition: width 0.1s ease;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    /* Cursor glow */
+    .cursor-glow {
+      position: fixed; width: 320px; height: 320px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(91,155,213,0.08) 0%, transparent 70%);
+      pointer-events: none; transform: translate(-50%, -50%);
+      z-index: 0; transition: opacity 0.2s;
     }
 
     .container {
-      max-width: 1100px;
-      width: 100%;
-      padding: 0 2rem;
-      position: relative;
-      z-index: 2;
-      margin: 3rem auto 4rem;
+      max-width: 1100px; width: 100%; padding: 0 2rem;
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column; gap: 6rem;
+      margin: 3rem 0 4rem;
     }
+
+    h1, h2, h3 { font-weight: 500; letter-spacing: -0.02em; }
 
     h1 {
       font-size: clamp(2.8rem, 8vw, 4.5rem);
-      font-weight: 600;
-      line-height: 1.1;
-      color: #f0f2f5;
+      font-weight: 600; line-height: 1.1; color: var(--text-primary);
     }
 
     h2 {
-      font-size: 1.8rem;
-      font-weight: 500;
-      color: #f0f2f5;
-      margin-bottom: 2rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
+      font-size: 1.8rem; font-weight: 500; color: var(--text-primary);
+      margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;
     }
 
     .section-title::before {
-      content: "▹";
-      color: #5b9bd5;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.4rem;
+      content: "▹"; color: var(--accent);
+      font-family: var(--font-mono); font-size: 1.4rem; font-weight: 400;
     }
 
-    p {
-      color: #9aa0ab;
-      font-size: 1.05rem;
-    }
+    p { color: var(--text-secondary); font-size: 1.05rem; }
 
-    a {
-      color: #5b9bd5;
-      text-decoration: none;
-      transition: color 0.25s ease;
-      font-weight: 500;
-    }
+    a { color: var(--accent); text-decoration: none; transition: color var(--transition); font-weight: 500; }
+    a:hover { color: #82b7ed; }
 
-    a:hover {
-      color: #82b7ed;
-    }
-
-    /* Navigation */
+    /* ----- Navigation ----- */
     nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.5rem 0;
-      width: 100%;
-      border-bottom: 1px solid #2a2d34;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.5rem 0; width: 100%; border-bottom: 1px solid var(--border);
     }
 
-    .logo {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.2rem;
-      color: #f0f2f5;
-    }
+    .logo { font-family: var(--font-mono); font-size: 1.2rem; color: var(--text-primary); letter-spacing: -0.5px; }
 
-    .nav-links {
-      display: flex;
-      gap: 2.2rem;
-      list-style: none;
-    }
+    .nav-links { display: flex; gap: 2.2rem; list-style: none; }
 
     .nav-links a {
-      color: #9aa0ab;
-      font-size: 0.95rem;
-      font-weight: 500;
-      transition: color 0.25s ease;
-      padding-bottom: 4px;
-      position: relative;
+      color: var(--text-secondary); font-size: 0.95rem; font-weight: 500;
+      transition: color var(--transition); position: relative; padding-bottom: 4px;
     }
 
-    .nav-links a:hover {
-      color: #f0f2f5;
+    .nav-links a:hover, .nav-links a.active { color: var(--text-primary); }
+
+    .nav-links a.active::after {
+      content: ''; position: absolute; bottom: -2px; left: 0;
+      width: 100%; height: 2px; background: var(--accent); border-radius: 2px;
     }
 
-    /* Hero */
-    .hero {
-      min-height: 85vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 1.5rem;
-    }
+    /* ----- Hero ----- */
+    .hero { min-height: 85vh; display: flex; flex-direction: column; justify-content: center; gap: 1.5rem; }
 
     .terminal-badge {
-      font-family: 'JetBrains Mono', monospace;
-      background: #1c1f24;
-      border: 1px solid #2a2d34;
-      padding: 0.5rem 1.2rem;
-      border-radius: 30px;
-      font-size: 0.85rem;
-      color: #9aa0ab;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      width: fit-content;
+      font-family: var(--font-mono); background: var(--surface-elevated);
+      border: 1px solid var(--border); padding: 0.5rem 1.2rem; border-radius: 30px;
+      font-size: 0.85rem; color: var(--text-secondary); display: inline-flex;
+      align-items: center; gap: 0.5rem; width: fit-content; letter-spacing: 0.3px;
     }
 
-    .terminal-prompt {
-      color: #7aa2f7;
-    }
+    .terminal-prompt { color: #7aa2f7; }
 
     .blinking-cursor {
-      display: inline-block;
-      width: 8px;
-      height: 1.2rem;
-      background: #5b9bd5;
-      margin-left: 4px;
-      animation: blink 1s step-end infinite;
-      vertical-align: middle;
+      display: inline-block; width: 8px; height: 1.2rem;
+      background: var(--accent); margin-left: 4px;
+      animation: blink 1s step-end infinite; vertical-align: middle;
     }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-    .hero-subtitle {
-      font-size: 1.25rem;
-      color: #9aa0ab;
-      max-width: 700px;
-    }
+    .hero-subtitle { font-size: 1.25rem; color: var(--text-secondary); max-width: 700px; margin-top: 0.5rem; }
+    .hero-philosophy { color: var(--text-muted); max-width: 600px; margin-top: 0.2rem; }
 
-    .hero-philosophy {
-      color: #606770;
-      max-width: 600px;
-    }
+    .cta-row { display: flex; gap: 1.2rem; margin-top: 1rem; flex-wrap: wrap; }
 
-    .cta-row {
-      display: flex;
-      gap: 1.2rem;
-      margin-top: 1rem;
-      flex-wrap: wrap;
-    }
-
-    /* Buttons */
+    /* ----- Buttons ----- */
     .btn {
-      padding: 0.85rem 2rem;
-      border-radius: 40px;
-      font-weight: 500;
-      font-size: 0.95rem;
-      transition: all 0.25s ease;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      text-decoration: none;
+      padding: 0.85rem 2rem; border-radius: 40px; font-weight: 500;
+      font-size: 0.95rem; transition: all var(--transition); border: 1px solid transparent;
+      cursor: pointer; background: transparent; color: var(--text-primary);
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      letter-spacing: -0.01em; text-decoration: none;
     }
 
-    .btn-primary {
-      background: #5b9bd5;
-      color: #0b0c0f;
-      font-weight: 600;
-      border: 1px solid #5b9bd5;
-    }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0c0f; font-weight: 600; }
+    .btn-primary:hover { background: #6da9e0; border-color: #6da9e0; }
+    .btn-outline { border: 1px solid var(--border); background: transparent; }
+    .btn-outline:hover { border-color: var(--accent); background: rgba(91, 155, 213, 0.06); }
 
-    .btn-primary:hover {
-      background: #6da9e0;
-    }
+    /* ----- About ----- */
+    .about-content { display: flex; flex-direction: column; gap: 1.2rem; max-width: 750px; }
 
-    .btn-outline {
-      border: 1px solid #2a2d34;
-      background: transparent;
-      color: #f0f2f5;
-    }
-
-    .btn-outline:hover {
-      border-color: #5b9bd5;
-      background: rgba(91, 155, 213, 0.06);
-    }
-
-    /* About */
-    .about-content {
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-      max-width: 750px;
-    }
-
-    /* Cards */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.8rem;
-    }
+    /* ----- Cards ----- */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.8rem; }
 
     .card {
-      background: #14161a;
-      border: 1px solid #2a2d34;
-      border-radius: 12px;
-      padding: 1.8rem;
-      transition: all 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.8rem;
+      transition: all 0.3s ease; display: flex; flex-direction: column; gap: 1rem;
     }
 
     .card:hover {
-      border-color: #3a404a;
-      background: #1c1f24;
-      transform: translateY(-3px);
+      border-color: #3a404a; background: var(--surface-elevated);
+      transform: translateY(-3px); box-shadow: 0 18px 30px -16px rgba(0,0,0,0.5);
     }
 
-    .card h3 {
-      font-size: 1.3rem;
-      font-weight: 500;
-    }
+    .card h3 { font-size: 1.3rem; font-weight: 500; }
 
-    .tech-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin: 0.5rem 0;
-    }
+    .tech-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0; }
 
     .tag {
-      background: rgba(91, 155, 213, 0.1);
-      color: #aac8f0;
-      font-size: 0.75rem;
-      padding: 0.25rem 0.8rem;
-      border-radius: 16px;
-      font-family: 'JetBrains Mono', monospace;
+      background: rgba(91, 155, 213, 0.1); color: #aac8f0; font-size: 0.75rem;
+      padding: 0.25rem 0.8rem; border-radius: 16px; font-family: var(--font-mono);
       border: 1px solid rgba(91, 155, 213, 0.2);
     }
 
-    .card-links {
-      display: flex;
-      gap: 1.5rem;
-      margin-top: auto;
-      font-size: 0.9rem;
-    }
+    .card-links { display: flex; gap: 1.5rem; margin-top: auto; font-size: 0.9rem; }
 
-    /* Skills */
-    .skills-category {
-      margin-bottom: 2rem;
-    }
+    /* ----- Skills ----- */
+    .skills-category { margin-bottom: 2rem; }
 
     .skills-category h4 {
-      font-family: 'JetBrains Mono', monospace;
-      color: #5b9bd5;
-      margin-bottom: 0.8rem;
-      font-weight: 500;
-      font-size: 0.95rem;
+      font-family: var(--font-mono); color: var(--accent); margin-bottom: 0.8rem;
+      font-weight: 500; font-size: 0.95rem;
     }
 
-    .badge-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.7rem;
-    }
+    .badge-group { display: flex; flex-wrap: wrap; gap: 0.7rem; }
 
     .skill-badge {
-      background: #1c1f24;
-      border: 1px solid #2a2d34;
-      padding: 0.5rem 1.2rem;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      color: #f0f2f5;
-      transition: 0.2s;
+      background: var(--surface-elevated); border: 1px solid var(--border);
+      padding: 0.5rem 1.2rem; border-radius: 20px; font-size: 0.9rem;
+      color: var(--text-primary); transition: 0.2s;
     }
 
-    .skill-badge:hover {
-      border-color: #5b9bd5;
-      background: #1f2530;
-    }
+    .skill-badge:hover { border-color: var(--accent); background: #1f2530; }
 
-    /* Timeline */
+    /* ----- Timeline ----- */
     .timeline {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-      border-left: 2px solid #2a2d34;
-      padding-left: 2rem;
-      margin-left: 0.5rem;
+      display: flex; flex-direction: column; gap: 2rem;
+      border-left: 2px solid var(--border); padding-left: 2rem; margin-left: 0.5rem;
     }
 
-    .timeline-item {
-      position: relative;
-      padding-bottom: 1rem;
-    }
+    .timeline-item { position: relative; padding-bottom: 1rem; }
 
     .timeline-item::before {
-      content: "";
-      position: absolute;
-      left: -2.45rem;
-      top: 0.35rem;
-      width: 10px;
-      height: 10px;
-      background: #5b9bd5;
-      border-radius: 50%;
-      border: 2px solid #0b0c0f;
+      content: ""; position: absolute; left: -2.45rem; top: 0.35rem;
+      width: 10px; height: 10px; background: var(--accent);
+      border-radius: 50%; border: 2px solid var(--bg);
     }
 
-    .timeline-role {
-      font-weight: 600;
-      font-size: 1.2rem;
-    }
+    .timeline-role { font-weight: 600; font-size: 1.2rem; }
+    .timeline-meta { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem; }
 
-    .timeline-meta {
-      color: #606770;
-      font-size: 0.85rem;
-      margin-bottom: 0.5rem;
-    }
-
-    /* Services */
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1.5rem;
-    }
+    /* ----- Services section ----- */
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
 
     .service-card {
-      background: #14161a;
-      border: 1px solid #2a2d34;
-      border-radius: 12px;
-      padding: 1.5rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem;
       transition: all 0.3s ease;
     }
 
     .service-card:hover {
-      border-color: #5b9bd5;
-      background: #1c1f24;
+      border-color: var(--accent); background: var(--surface-elevated);
       transform: translateY(-2px);
     }
 
+    /* live badge on project cards */
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: var(--font-mono); font-size: 0.7rem;
+      color: #6ee7b7; background: rgba(110,231,183,0.08);
+      border: 1px solid rgba(110,231,183,0.2);
+      padding: 0.18rem 0.6rem; border-radius: 12px;
+      letter-spacing: 0.03em; margin-left: 0.5rem; vertical-align: middle;
+    }
+    .live-badge::before {
+      content: ''; width: 5px; height: 5px; border-radius: 50%;
+      background: #6ee7b7; animation: pulse-dot 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+    /* fade-in via class — never leaves elements invisible on file:// */
+    .will-fade {
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.55s ease, transform 0.45s ease;
+    }
+    .will-fade.in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     .service-icon {
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
       background: rgba(91, 155, 213, 0.08);
       border: 1px solid rgba(91, 155, 213, 0.2);
       border-radius: 10px;
-      color: #5b9bd5;
+      color: var(--accent);
       margin-bottom: 0.8rem;
     }
+    .service-card h4 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary); }
+    .service-card p { font-size: 0.9rem; color: var(--text-secondary); }
 
-    .service-card h4 {
-      font-size: 1.05rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: #f0f2f5;
-    }
-
-    .service-card p {
-      font-size: 0.9rem;
-      color: #9aa0ab;
-    }
-
-    /* Contact */
-    .contact-intro {
-      margin-bottom: 1.5rem;
-    }
-
-    .contact-links {
-      display: flex;
-      gap: 2rem;
-      flex-wrap: wrap;
-      font-size: 1rem;
-    }
+    /* ----- Contact ----- */
+    .contact-intro { margin-bottom: 1.5rem; }
+    .contact-links { display: flex; gap: 2rem; flex-wrap: wrap; font-size: 1rem; }
 
     .contact-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: #9aa0ab;
+      display: flex; align-items: center; gap: 0.5rem;
+      color: var(--text-secondary);
     }
 
-    .contact-item svg {
-      color: #5b9bd5;
-    }
+    .contact-item svg { color: var(--accent); flex-shrink: 0; }
+    .resume-download { margin-top: 2rem; }
 
-    .resume-download {
-      margin-top: 2rem;
-    }
+    /* ----- Footer ----- */
+    hr { border-color: var(--border); margin: 1rem 0; }
+    footer { color: var(--text-muted); font-size: 0.85rem; text-align: center; margin-top: 2rem; }
 
-    hr {
-      border-color: #2a2d34;
-      margin: 1rem 0;
-    }
-
-    footer {
-      color: #606770;
-      font-size: 0.85rem;
-      text-align: center;
-      margin-top: 2rem;
-    }
-
-    /* Mobile menu */
+    /* ----- Mobile menu toggle ----- */
     .menu-toggle {
-      display: none;
-      background: none;
-      border: 1px solid #2a2d34;
-      color: #f0f2f5;
-      padding: 0.4rem 0.8rem;
-      border-radius: 8px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
+      display: none; background: none; border: 1px solid var(--border);
+      color: var(--text-primary); padding: 0.4rem 0.8rem;
+      border-radius: 8px; font-family: var(--font-mono); font-size: 0.85rem;
       cursor: pointer;
     }
 
+    /* ----- Responsive ----- */
     @media (max-width: 700px) {
-      .container {
-        padding: 0 1.2rem;
-      }
+      .container { padding: 0 1.2rem; gap: 4rem; }
 
-      nav {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
-      }
+      nav { flex-direction: column; gap: 1rem; align-items: flex-start; }
 
-      .menu-toggle {
-        display: block;
-      }
+      .menu-toggle { display: block; }
 
       .nav-links {
-        display: none;
-        flex-direction: column;
-        gap: 0.8rem;
-        width: 100%;
-        padding: 1rem 0;
+        display: none; flex-direction: column; gap: 0.8rem;
+        width: 100%; padding: 1rem 0;
       }
 
-      .nav-links.open {
-        display: flex;
-      }
+      .nav-links.open { display: flex; }
+      .nav-links a { font-size: 1rem; }
 
-      .hero {
-        min-height: 60vh;
-      }
-    }
-
-    section {
-      margin-bottom: 2rem;
+      .hero { min-height: 60vh; }
     }
   </style>
 </head>
 <body>
   <div id="progress-bar"></div>
+  <div class="cursor-glow" id="cursor-glow"></div>
 
   <div class="container">
+    <!-- Navigation -->
     <nav>
       <div class="logo">john@davies:~$</div>
-      <button class="menu-toggle" id="menu-toggle">☰ menu</button>
+      <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰ menu</button>
       <ul class="nav-links" id="nav-links">
-        <li><a href="#about">about</a></li>
-        <li><a href="#services">services</a></li>
-        <li><a href="#projects">projects</a></li>
-        <li><a href="#skills">skills</a></li>
-        <li><a href="#experience">experience</a></li>
-        <li><a href="#contact">contact</a></li>
+        <li><a href="#about" class="nav-link">about</a></li>
+        <li><a href="#services" class="nav-link">services</a></li>
+        <li><a href="#projects" class="nav-link">projects</a></li>
+        <li><a href="#skills" class="nav-link">skills</a></li>
+        <li><a href="#experience" class="nav-link">experience</a></li>
+        <li><a href="#contact" class="nav-link">contact</a></li>
       </ul>
     </nav>
 
-    <section class="hero">
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
       <div class="terminal-badge">
         <span class="terminal-prompt">❯</span> systems online <span class="blinking-cursor"></span>
       </div>
@@ -536,113 +361,384 @@
       </div>
     </section>
 
+    <!-- About Section -->
     <section id="about">
       <h2 class="section-title">About</h2>
       <div class="about-content">
-        <p>I'm a full-stack engineer and infrastructure specialist who works across the entire stack — from cloud deployment to customer-facing web apps. Over the years I've designed Kubernetes clusters, built Django backends, automated lead generation pipelines, and shipped point-of-sale and captive WiFi portal systems for real businesses.</p>
-        <p>My work lives at the intersection of infrastructure and application delivery. I believe in owning the problem end-to-end: designing the architecture, writing the code, automating the operations, and handing teams something that runs reliably without constant intervention.</p>
-        <p>Whether it's a cloud migration, a Python script that saves 10 hours a week, or a custom POS system for a local business — I build things that work.</p>
+        <p>
+          I'm a full-stack engineer and infrastructure specialist who works across the entire stack — from cloud deployment to customer-facing web apps. Over the years I've designed Kubernetes clusters, built Django backends, automated lead generation pipelines, and shipped point-of-sale and captive WiFi portal systems for real businesses.
+        </p>
+        <p>
+          My work lives at the intersection of infrastructure and application delivery. I believe in owning the problem end-to-end: designing the architecture, writing the code, automating the operations, and handing teams something that runs reliably without constant intervention.
+        </p>
+        <p>
+          Whether it's a cloud migration, a Python script that saves 10 hours a week, or a custom POS system for a local business — I build things that work.
+        </p>
       </div>
     </section>
 
+    <!-- Services Section -->
     <section id="services">
       <h2 class="section-title">What I Do</h2>
       <div class="services-grid">
-        <div class="service-card"><div class="service-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><h4>Full-Stack Web Development</h4><p>End-to-end web apps using HTML, CSS, JavaScript, Python, and Django.</p></div>
-        <div class="service-card"><div class="service-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></div><h4>Cloud Infrastructure</h4><p>Multi-cloud architecture, Kubernetes, Terraform, and CI/CD pipelines.</p></div>
-        <div class="service-card"><div class="service-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><h4>Python Automation</h4><p>Custom scripts that eliminate repetitive work — file processing, reporting, and more.</p></div>
-        <div class="service-card"><div class="service-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><h4>Lead Generation Systems</h4><p>Automated prospecting pipelines that help fill sales funnel consistently.</p></div>
-        <div class="service-card"><div class="service-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div><h4>Point of Sale Systems</h4><p>Custom POS solutions with inventory management, receipts, and reporting.</p></div>
-        <div class="service-card"><div class="service-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div><h4>WiFi Captive Portals</h4><p>Branded hotspot portals with authentication, analytics, and integrations.</p></div>
+        <div class="service-card">
+          <div class="service-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <h4>Full-Stack Web Development</h4>
+          <p>End-to-end web apps using HTML, CSS, JavaScript, Python, and Django — from landing pages to complex dashboards.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+          </div>
+          <h4>Cloud Infrastructure</h4>
+          <p>Multi-cloud architecture, Kubernetes, Terraform, and CI/CD pipelines. Systems that scale and recover gracefully.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <h4>Python Automation</h4>
+          <p>Custom scripts and Make/Zapier integrations that eliminate repetitive work — file processing, reporting, notifications, and more.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <h4>Lead Generation Systems</h4>
+          <p>Automated prospecting pipelines and data workflows that help organisations consistently fill their sales funnel.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          </div>
+          <h4>Point of Sale Systems</h4>
+          <p>Custom POS solutions for retail, hospitality, and service businesses — inventory management, receipts, and reporting built in.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+          </div>
+          <h4>WiFi Captive Portals</h4>
+          <p>Branded hotspot portals with authentication, analytics, and marketing integrations for venues and businesses.</p>
+        </div>
       </div>
     </section>
 
+    <!-- Projects Section -->
     <section id="projects">
       <h2 class="section-title">Selected Projects</h2>
       <div class="grid">
-        <div class="card"><h3>Hybrid Cloud Orchestrator</h3><p>Multi-cloud provisioning engine using Terraform and custom operators.</p><div class="tech-tags"><span class="tag">Go</span><span class="tag">Terraform</span><span class="tag">Kubernetes</span></div><div class="card-links"><a href="#">github ↗</a><a href="#">live demo ↗</a></div></div>
-        <div class="card"><h3>Lead Gen Automation Pipeline</h3><p>Python-powered scraping workflow delivering 500+ qualified leads/week.</p><div class="tech-tags"><span class="tag">Python</span><span class="tag">Django</span><span class="tag">REST APIs</span></div><div class="card-links"><a href="#">case study ↗</a></div></div>
-        <div class="card"><h3>Venue WiFi Portal</h3><p>Captive portal with branded login, email capture, and analytics dashboard.</p><div class="tech-tags"><span class="tag">Django</span><span class="tag">JavaScript</span><span class="tag">PostgreSQL</span></div><div class="card-links"><a href="#">live demo ↗</a></div></div>
-        <div class="card"><h3>Retail POS System</h3><p>Web-based POS with inventory, employee shifts, M-Pesa integration.</p><div class="tech-tags"><span class="tag">Django</span><span class="tag">HTML/CSS/JS</span><span class="tag">M-Pesa</span></div><div class="card-links"><a href="#">github ↗</a><a href="#">demo ↗</a></div></div>
-        <div class="card"><h3>Observability Pipeline</h3><p>Real-time log aggregation on OpenTelemetry and ClickHouse.</p><div class="tech-tags"><span class="tag">Python</span><span class="tag">OpenTelemetry</span><span class="tag">ClickHouse</span></div><div class="card-links"><a href="#">github ↗</a><a href="#">case study ↗</a></div></div>
-        <div class="card"><h3>Serverless Data Mesh</h3><p>Event-driven architecture for real-time analytics using Lambda and Kafka.</p><div class="tech-tags"><span class="tag">TypeScript</span><span class="tag">Kafka</span><span class="tag">AWS Lambda</span></div><div class="card-links"><a href="#">github ↗</a><a href="#">demo ↗</a></div></div>
+
+        <div class="card">
+          <h3>
+            SecureScrow Kenya
+            <span class="live-badge">live</span>
+          </h3>
+          <p>Escrow platform built for the Kenyan market. Buyers and sellers transact through a neutral holding layer — funds are only released once both parties confirm delivery. Handles M-Pesa and bank transfers.</p>
+          <div class="tech-tags">
+            <span class="tag">Django</span>
+            <span class="tag">Python</span>
+            <span class="tag">M-Pesa API</span>
+            <span class="tag">PostgreSQL</span>
+            <span class="tag">JavaScript</span>
+          </div>
+          <div class="card-links">
+            <a href="https://securescrowkenya.com" target="_blank" rel="noopener">visit site ↗</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>
+            X-Downloadit
+            <span class="live-badge">live</span>
+          </h3>
+          <p>Web-based media downloader that lets users pull content from major platforms without needing desktop software. Clean interface, fast processing, and support for multiple output formats.</p>
+          <div class="tech-tags">
+            <span class="tag">Python</span>
+            <span class="tag">Django</span>
+            <span class="tag">JavaScript</span>
+            <span class="tag">HTML/CSS</span>
+          </div>
+          <div class="card-links">
+            <a href="https://x-downloadit.com" target="_blank" rel="noopener">visit site ↗</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Telegram Subscription Manager Bot</h3>
+          <p>Automates subscription lifecycles inside Telegram — users subscribe, get access to gated channels, and are removed automatically on expiry. Handles payment confirmation, renewal reminders, and admin dashboards via bot commands.</p>
+          <div class="tech-tags">
+            <span class="tag">Python</span>
+            <span class="tag">python-telegram-bot</span>
+            <span class="tag">SQLite</span>
+            <span class="tag">M-Pesa API</span>
+          </div>
+          <div class="card-links">
+            <a href="#contact">request demo ↗</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Job Hunter Bot</h3>
+          <p>Monitors job listings across target websites and Reddit in real time. When a matching post is found it sends a formatted alert directly to the user on Telegram — title, source, link, and posted time. Configurable by keyword and subreddit.</p>
+          <div class="tech-tags">
+            <span class="tag">Python</span>
+            <span class="tag">PRAW</span>
+            <span class="tag">BeautifulSoup</span>
+            <span class="tag">Telegram Bot API</span>
+          </div>
+          <div class="card-links">
+            <a href="#contact">request demo ↗</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Lead Gen Automation Pipeline</h3>
+          <p>Python-powered scraping and enrichment workflow delivering qualified leads to a client's CRM on a schedule. Zero manual input once configured.</p>
+          <div class="tech-tags">
+            <span class="tag">Python</span>
+            <span class="tag">Django</span>
+            <span class="tag">Make</span>
+            <span class="tag">REST APIs</span>
+          </div>
+          <div class="card-links">
+            <a href="#contact">case study ↗</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Venue WiFi Portal</h3>
+          <p>Captive portal for a hospitality business — branded login, email capture, SMS vouchers, and a live analytics dashboard for the owner.</p>
+          <div class="tech-tags">
+            <span class="tag">Django</span>
+            <span class="tag">JavaScript</span>
+            <span class="tag">MikroTik API</span>
+            <span class="tag">PostgreSQL</span>
+          </div>
+          <div class="card-links">
+            <a href="#contact">request demo ↗</a>
+          </div>
+        </div>
+
       </div>
     </section>
 
+    <!-- Skills Section -->
     <section id="skills">
       <h2 class="section-title">Technical Skills</h2>
-      <div class="skills-category"><h4>Full-Stack & Web</h4><div class="badge-group"><span class="skill-badge">HTML/CSS</span><span class="skill-badge">JavaScript</span><span class="skill-badge">Python</span><span class="skill-badge">Django</span><span class="skill-badge">REST APIs</span><span class="skill-badge">PostgreSQL</span></div></div>
-      <div class="skills-category"><h4>Cloud & DevOps</h4><div class="badge-group"><span class="skill-badge">AWS</span><span class="skill-badge">GCP</span><span class="skill-badge">Azure</span><span class="skill-badge">Terraform</span><span class="skill-badge">Docker</span><span class="skill-badge">Kubernetes</span></div></div>
-      <div class="skills-category"><h4>Automation & Integrations</h4><div class="badge-group"><span class="skill-badge">Python Scripts</span><span class="skill-badge">Make</span><span class="skill-badge">GitHub Actions</span><span class="skill-badge">CI/CD</span><span class="skill-badge">Kafka</span><span class="skill-badge">Redis</span></div></div>
-      <div class="skills-category"><h4>Specialisations</h4><div class="badge-group"><span class="skill-badge">POS Systems</span><span class="skill-badge">WiFi Portals</span><span class="skill-badge">Lead Generation</span><span class="skill-badge">MikroTik</span><span class="skill-badge">M-Pesa API</span><span class="skill-badge">Go</span></div></div>
+      <div class="skills-category">
+        <h4>Full-Stack & Web</h4>
+        <div class="badge-group">
+          <span class="skill-badge">HTML/CSS</span>
+          <span class="skill-badge">JavaScript</span>
+          <span class="skill-badge">Python</span>
+          <span class="skill-badge">Django</span>
+          <span class="skill-badge">REST APIs</span>
+          <span class="skill-badge">PostgreSQL</span>
+        </div>
+      </div>
+      <div class="skills-category">
+        <h4>Cloud & DevOps</h4>
+        <div class="badge-group">
+          <span class="skill-badge">AWS</span>
+          <span class="skill-badge">GCP</span>
+          <span class="skill-badge">Azure</span>
+          <span class="skill-badge">Terraform</span>
+          <span class="skill-badge">Docker</span>
+          <span class="skill-badge">Kubernetes</span>
+        </div>
+      </div>
+      <div class="skills-category">
+        <h4>Automation & Integrations</h4>
+        <div class="badge-group">
+          <span class="skill-badge">Python Scripts</span>
+          <span class="skill-badge">Make (Integromat)</span>
+          <span class="skill-badge">GitHub Actions</span>
+          <span class="skill-badge">CI/CD</span>
+          <span class="skill-badge">Kafka</span>
+          <span class="skill-badge">Redis</span>
+        </div>
+      </div>
+      <div class="skills-category">
+        <h4>Specialisations</h4>
+        <div class="badge-group">
+          <span class="skill-badge">POS Systems</span>
+          <span class="skill-badge">WiFi Portals</span>
+          <span class="skill-badge">Lead Generation</span>
+          <span class="skill-badge">Telegram Bots</span>
+          <span class="skill-badge">MikroTik</span>
+          <span class="skill-badge">M-Pesa API</span>
+          <span class="skill-badge">Go</span>
+        </div>
+      </div>
     </section>
 
+    <!-- Experience Section -->
     <section id="experience">
       <h2 class="section-title">Experience</h2>
       <div class="timeline">
-        <div class="timeline-item"><div class="timeline-role">Senior Infrastructure Engineer · StellarNode</div><div class="timeline-meta">2022 – Present · Remote</div><p>Architected multi-region Kubernetes platform; reduced cloud spend by 34%.</p></div>
-        <div class="timeline-item"><div class="timeline-role">Full-Stack Engineer & Automation Specialist · Freelance</div><div class="timeline-meta">2020 – Present · Remote</div><p>Built Django apps, POS systems, and captive WiFi portals for SMEs.</p></div>
-        <div class="timeline-item"><div class="timeline-role">Platform Engineer · DataFlow Systems</div><div class="timeline-meta">2019 – 2022 · New York</div><p>Built internal developer platform and CI/CD pipelines serving 200+ engineers.</p></div>
-        <div class="timeline-item"><div class="timeline-role">Backend Engineer · Orbital Software</div><div class="timeline-meta">2016 – 2019 · Berlin</div><p>Designed event-sourced microservices handling financial transactions.</p></div>
+        <div class="timeline-item">
+          <div class="timeline-role">Senior Infrastructure Engineer · StellarNode</div>
+          <div class="timeline-meta">2022 – Present · Remote</div>
+          <p>Architected multi-region Kubernetes platform; reduced cloud spend by 34% while improving uptime to 99.99%.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-role">Full-Stack Engineer & Automation Specialist · Freelance</div>
+          <div class="timeline-meta">2020 – Present · Remote</div>
+          <p>Built Django web apps, POS systems, and captive WiFi portals for SMEs. Developed Python automation pipelines for lead generation and business workflow optimisation across multiple client organisations.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-role">Platform Engineer · DataFlow Systems</div>
+          <div class="timeline-meta">2019 – 2022 · New York</div>
+          <p>Built internal developer platform and CI/CD pipelines serving 200+ engineers. Led migration to infrastructure-as-code.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-role">Backend Engineer · Orbital Software</div>
+          <div class="timeline-meta">2016 – 2019 · Berlin</div>
+          <p>Designed event-sourced microservices handling financial transactions. Improved resilience patterns across services.</p>
+        </div>
       </div>
     </section>
 
+    <!-- Contact Section -->
     <section id="contact">
       <h2 class="section-title">Contact</h2>
       <p class="contact-intro">Available for consulting, freelance projects, and senior engineering roles.</p>
       <div class="contact-links">
-        <span class="contact-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><a href="mailto:john.davies@infra.dev">john.davies@infra.dev</a></span>
-        <span class="contact-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg><a href="#">github/jdavies</a></span>
-        <span class="contact-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg><a href="#">linkedin/in/johndavies</a></span>
+        <span class="contact-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <a href="mailto:john.davies@infra.dev">john.davies@infra.dev</a>
+        </span>
+        <span class="contact-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          <a href="https://github.com/jdavies" target="_blank">github/jdavies</a>
+        </span>
+        <span class="contact-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          <a href="https://linkedin.com/in/johndavies" target="_blank">linkedin/in/johndavies</a>
+        </span>
       </div>
-      <div class="resume-download"><a href="#" class="btn btn-outline" id="resume-btn">📄 Download Resume</a></div>
+      <div class="resume-download">
+        <a href="resume.pdf" class="btn btn-outline" download>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Resume
+        </a>
+      </div>
     </section>
 
-    <footer><hr><p>© 2025 John Davies · Built with discipline, not templates.</p></footer>
+    <footer>
+      <hr>
+      <p>© 2025 John Davies · Built with discipline, not templates.</p>
+    </footer>
   </div>
 
   <script>
-    // Progress bar
-    window.addEventListener('scroll', function() {
-      var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-      var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      var scrolled = (winScroll / height) * 100;
-      document.getElementById('progress-bar').style.width = scrolled + '%';
-    });
-
-    // Mobile menu toggle
-    var toggle = document.getElementById('menu-toggle');
-    var navLinks = document.getElementById('nav-links');
-    if (toggle) {
-      toggle.addEventListener('click', function() {
-        navLinks.classList.toggle('open');
+    (function() {
+      // Scroll progress bar
+      const progressBar = document.getElementById('progress-bar');
+      window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrolled = (scrollTop / docHeight) * 100;
+        if (progressBar) progressBar.style.width = `${scrolled}%`;
       });
-    }
 
-    // Smooth scroll
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function(e) {
-        var href = this.getAttribute('href');
-        if (href === "#") return;
-        var target = document.querySelector(href);
-        if (target) {
-          e.preventDefault();
-          navLinks.classList.remove('open');
-          target.scrollIntoView({ behavior: 'smooth' });
-        }
+      // Cursor glow (desktop only)
+      const glow = document.getElementById('cursor-glow');
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      if (glow && !isTouchDevice) {
+        document.addEventListener('mousemove', (e) => {
+          glow.style.left = e.clientX + 'px';
+          glow.style.top = e.clientY + 'px';
+          glow.style.opacity = '1';
+        });
+        document.addEventListener('mouseleave', () => { glow.style.opacity = '0'; });
+      } else if (glow) {
+        glow.style.display = 'none';
+      }
+
+      // Mobile menu toggle
+      const menuToggle = document.getElementById('menu-toggle');
+      const navLinks = document.getElementById('nav-links');
+      if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => {
+          navLinks.classList.toggle('open');
+        });
+      }
+
+      // Active nav highlighting
+      const sections = document.querySelectorAll('section[id]');
+      const links = document.querySelectorAll('.nav-link');
+
+      function updateActiveLink() {
+        let current = '';
+        const scrollPos = window.scrollY + 120;
+        sections.forEach(section => {
+          const top = section.offsetTop - 100;
+          if (scrollPos >= top && scrollPos < top + section.offsetHeight) {
+            current = section.getAttribute('id');
+          }
+        });
+        links.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === `#${current}`) link.classList.add('active');
+        });
+      }
+
+      window.addEventListener('scroll', updateActiveLink);
+      window.addEventListener('load', updateActiveLink);
+
+      // Smooth scroll
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          const href = this.getAttribute('href');
+          if (href === "#") return;
+          const target = document.querySelector(href);
+          if (target) {
+            e.preventDefault();
+            // Close mobile menu on click
+            if (navLinks) navLinks.classList.remove('open');
+            target.scrollIntoView({ behavior: 'smooth' });
+            history.pushState(null, null, href);
+          }
+        });
       });
-    });
 
-    // Resume button
-    var resumeBtn = document.getElementById('resume-btn');
-    if (resumeBtn) {
-      resumeBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        alert('Contact John directly for a detailed CV: john.davies@infra.dev');
-      });
-    }
+      // Fade-in on scroll — class-based so file:// protocol never leaves page blank
+      const fadeEls = document.querySelectorAll('.card, .timeline-item, .skills-category, .service-card');
 
-    console.log('Portfolio loaded successfully!');
+      // Mark elements for animation
+      fadeEls.forEach(el => el.classList.add('will-fade'));
+
+      if (!window.IntersectionObserver) {
+        // Fallback: no observer support — just show everything
+        fadeEls.forEach(el => el.classList.add('in-view'));
+      } else {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('in-view');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
+
+        fadeEls.forEach(el => observer.observe(el));
+
+        // Safety net: after load, force-show anything already in viewport
+        window.addEventListener('load', () => {
+          fadeEls.forEach(el => {
+            const r = el.getBoundingClientRect();
+            if (r.top < window.innerHeight + 60) el.classList.add('in-view');
+          });
+        });
+      }
+
+      console.log('%c👋 Hello from John Davies portfolio.', 'color: #7aa2f7; font-size: 14px;');
+      window.addEventListener('load', () => document.body.classList.add('loaded'));
+    })();
   </script>
 </body>
 </html>
