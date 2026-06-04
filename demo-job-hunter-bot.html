@@ -1,0 +1,949 @@
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Hunter Bot — Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:               #0b0c0f;
+      --surface:          #14161a;
+      --surface-elevated: #1c1f24;
+      --surface-high:     #22262d;
+      --border:           #2a2d34;
+      --text-primary:     #f0f2f5;
+      --text-secondary:   #9aa0ab;
+      --text-muted:       #555c68;
+      --accent:           #5b9bd5;
+      --accent-dim:       rgba(91,155,213,0.12);
+      --accent-border:    rgba(91,155,213,0.22);
+      --green:            #4ade80;
+      --green-dim:        rgba(74,222,128,0.10);
+      --green-border:     rgba(74,222,128,0.20);
+      --amber:            #f59e0b;
+      --amber-dim:        rgba(245,158,11,0.10);
+      --amber-border:     rgba(245,158,11,0.20);
+      --font-sans:        'Inter', system-ui, sans-serif;
+      --font-mono:        'JetBrains Mono', 'Courier New', monospace;
+      --radius:           10px;
+      --radius-sm:        6px;
+    }
+
+    html { background: var(--bg); }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- topbar ---- */
+    .topbar {
+      border-bottom: 1px solid var(--border);
+      padding: 0.9rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: rgba(11,12,15,0.92);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+    }
+
+    .topbar-left { display: flex; align-items: center; gap: 1.2rem; }
+
+    .back-link {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--text-secondary); }
+
+    .topbar-divider { width: 1px; height: 16px; background: var(--border); }
+
+    .topbar-title {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .status-pill {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-family: var(--font-mono); font-size: 0.72rem;
+      color: var(--green); background: var(--green-dim);
+      border: 1px solid var(--green-border);
+      padding: 0.22rem 0.7rem; border-radius: 20px;
+    }
+    .status-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--green);
+      animation: blink-dot 2.2s ease-in-out infinite;
+    }
+    @keyframes blink-dot { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+    /* ---- layout ---- */
+    .page {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 3rem 2rem 5rem;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    /* ---- left panel ---- */
+    .meta h1 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 0.9rem;
+    }
+
+    .meta .subtitle {
+      font-size: 0.98rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 540px;
+      margin-bottom: 2rem;
+    }
+
+    .tag-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2.5rem; }
+
+    .tag {
+      font-family: var(--font-mono); font-size: 0.72rem;
+      color: #9ab8d8; background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      padding: 0.2rem 0.65rem; border-radius: 14px;
+    }
+
+    .feature-block { margin-bottom: 2.5rem; }
+
+    .feature-block h3 {
+      font-size: 0.72rem; font-family: var(--font-mono);
+      color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 0.1em; margin-bottom: 1rem;
+    }
+
+    .feature-list { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; }
+
+    .feature-list li {
+      display: flex; align-items: flex-start; gap: 0.7rem;
+      font-size: 0.93rem; color: var(--text-secondary); line-height: 1.55;
+    }
+
+    .feature-list li::before {
+      content: ''; width: 5px; height: 5px; border-radius: 50%;
+      background: var(--accent); margin-top: 0.5rem; flex-shrink: 0;
+    }
+
+    /* ---- sources table ---- */
+    .sources-block { margin-bottom: 2.5rem; }
+
+    .sources-block h3 {
+      font-size: 0.72rem; font-family: var(--font-mono);
+      color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 0.1em; margin-bottom: 1rem;
+    }
+
+    .sources-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .sources-table thead tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sources-table th {
+      text-align: left;
+      padding: 0.5rem 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .sources-table td {
+      padding: 0.6rem 0.8rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-subtle, #1a1d22);
+      vertical-align: middle;
+    }
+
+    .sources-table tr:last-child td { border-bottom: none; }
+
+    .src-badge {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      padding: 0.15rem 0.55rem; border-radius: 10px;
+      display: inline-block;
+    }
+
+    .src-reddit {
+      color: #e07b4a;
+      background: rgba(224,123,74,0.10);
+      border: 1px solid rgba(224,123,74,0.2);
+    }
+
+    .src-web {
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+    }
+
+    /* ---- flow ---- */
+    .flow-block h3 {
+      font-size: 0.72rem; font-family: var(--font-mono);
+      color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 0.1em; margin-bottom: 1rem;
+    }
+
+    .flow { display: flex; flex-direction: column; gap: 0; }
+
+    .flow-step { display: flex; align-items: flex-start; gap: 1rem; position: relative; }
+
+    .flow-step:not(:last-child)::after {
+      content: ''; position: absolute; left: 15px; top: 30px;
+      width: 1px; height: calc(100% + 2px); background: var(--border);
+    }
+
+    .step-node {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--surface-elevated);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent);
+      flex-shrink: 0; z-index: 1; position: relative;
+    }
+
+    .step-body { padding-bottom: 1.6rem; }
+    .step-body strong { display: block; font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.2rem; }
+    .step-body span { font-size: 0.84rem; color: var(--text-secondary); }
+
+    /* ---- right panel: feed sim ---- */
+    .feed-panel { position: sticky; top: 5rem; }
+
+    .feed-label {
+      font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.8rem;
+    }
+
+    /* config bar */
+    .config-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius) var(--radius) 0 0;
+      border-bottom: none;
+      padding: 0.9rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .config-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .config-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      width: 60px;
+      flex-shrink: 0;
+    }
+
+    .config-input {
+      flex: 1;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.38rem 0.7rem;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .config-input::placeholder { color: var(--text-muted); }
+    .config-input:focus { border-color: var(--accent); }
+
+    .config-select {
+      flex: 1;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.38rem 0.7rem;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .config-select:focus { border-color: var(--accent); }
+
+    .scan-btn {
+      width: 100%;
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 0.52rem;
+      color: #0b0c0f;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: background 0.2s;
+      margin-top: 0.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+    .scan-btn:hover { background: #6da9e0; }
+    .scan-btn:disabled { background: var(--surface-elevated); color: var(--text-muted); cursor: not-allowed; border: 1px solid var(--border); }
+
+    /* results feed */
+    .feed-window {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 var(--radius) var(--radius);
+      overflow: hidden;
+    }
+
+    .feed-toolbar {
+      border-bottom: 1px solid var(--border);
+      padding: 0.55rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-elevated);
+    }
+
+    .feed-toolbar-left {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .feed-count {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+    }
+
+    .feed-list {
+      height: 360px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .feed-list::-webkit-scrollbar { width: 4px; }
+    .feed-list::-webkit-scrollbar-track { background: transparent; }
+    .feed-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .feed-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: var(--text-muted);
+      font-size: 0.83rem;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .feed-empty .empty-hint {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      opacity: 0.6;
+    }
+
+    .job-card {
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid var(--border-subtle, #1a1d22);
+      transition: background 0.15s;
+      cursor: default;
+      animation: slide-in 0.25s ease;
+    }
+
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .job-card:hover { background: var(--surface-elevated); }
+    .job-card:last-child { border-bottom: none; }
+
+    .job-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .job-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.3;
+      flex: 1;
+    }
+
+    .job-source-badge { flex-shrink: 0; }
+
+    .job-meta {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      margin-bottom: 0.4rem;
+    }
+
+    .job-snippet {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .job-footer {
+      margin-top: 0.45rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .job-link {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .job-link:hover { text-decoration: underline; }
+
+    .sent-tag {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--green);
+      background: var(--green-dim);
+      border: 1px solid var(--green-border);
+      padding: 0.1rem 0.5rem;
+      border-radius: 10px;
+    }
+
+    .scanning-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-subtle, #1a1d22);
+      background: var(--surface-elevated);
+    }
+
+    .scan-spinner {
+      width: 14px; height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* telegram preview */
+    .tg-preview {
+      margin-top: 0.8rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .tg-preview-header {
+      background: var(--surface-elevated);
+      border-bottom: 1px solid var(--border);
+      padding: 0.65rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .tg-message {
+      padding: 1rem;
+      font-size: 0.83rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      font-family: var(--font-sans);
+      min-height: 60px;
+    }
+
+    .tg-message .tg-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.88rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .tg-message .tg-link {
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+    }
+
+    .tg-message .tg-field {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .tg-empty {
+      padding: 1rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* ---- responsive ---- */
+    @media (max-width: 820px) {
+      .page { grid-template-columns: 1fr; padding: 2rem 1.2rem 4rem; gap: 2.5rem; }
+      .feed-panel { position: static; }
+      .topbar { padding: 0.85rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="index.html" class="back-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        back to portfolio
+      </a>
+      <div class="topbar-divider"></div>
+      <span class="topbar-title">job-hunter-bot / demo</span>
+    </div>
+    <div class="status-pill">
+      <span class="status-dot"></span>
+      simulation running
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- LEFT -->
+    <div class="meta">
+      <h1>Job Hunter Bot</h1>
+      <p class="subtitle">
+        Monitors job listings across target websites and Reddit in real time. When a post matches your configured keywords, it sends a structured alert directly to your Telegram — title, source, link, salary if available, and time posted. No inbox noise, no missed opportunities.
+      </p>
+
+      <div class="tag-row">
+        <span class="tag">Python</span>
+        <span class="tag">PRAW</span>
+        <span class="tag">BeautifulSoup</span>
+        <span class="tag">Requests</span>
+        <span class="tag">Telegram Bot API</span>
+        <span class="tag">APScheduler</span>
+        <span class="tag">SQLite</span>
+      </div>
+
+      <div class="feature-block">
+        <h3>What it does</h3>
+        <ul class="feature-list">
+          <li>Polls configured job boards and subreddits on a user-defined schedule (default: every 15 minutes)</li>
+          <li>Deduplicates results against a local SQLite store — each listing is only sent once</li>
+          <li>Keyword matching supports phrases, AND/OR logic, and exclusion terms</li>
+          <li>Sends a formatted Telegram message per match: title, company, location, salary, source, and direct link</li>
+          <li>Tracks which listings were sent and when — queryable via bot commands</li>
+          <li>Commands to pause, resume, update keywords, and list recent matches without editing config files</li>
+          <li>Runs as a background process on any Linux server or VPS with minimal resource usage</li>
+        </ul>
+      </div>
+
+      <div class="sources-block">
+        <h3>Supported sources</h3>
+        <table class="sources-table">
+          <thead>
+            <tr>
+              <th>Source</th>
+              <th>Type</th>
+              <th>Method</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>r/forhire</td>
+              <td><span class="src-badge src-reddit">reddit</span></td>
+              <td>PRAW API</td>
+            </tr>
+            <tr>
+              <td>r/devops</td>
+              <td><span class="src-badge src-reddit">reddit</span></td>
+              <td>PRAW API</td>
+            </tr>
+            <tr>
+              <td>r/remotework</td>
+              <td><span class="src-badge src-reddit">reddit</span></td>
+              <td>PRAW API</td>
+            </tr>
+            <tr>
+              <td>RemoteOK</td>
+              <td><span class="src-badge src-web">web</span></td>
+              <td>JSON feed</td>
+            </tr>
+            <tr>
+              <td>We Work Remotely</td>
+              <td><span class="src-badge src-web">web</span></td>
+              <td>RSS / scrape</td>
+            </tr>
+            <tr>
+              <td>Custom URLs</td>
+              <td><span class="src-badge src-web">web</span></td>
+              <td>Configurable scrape</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flow-block">
+        <h3>Execution flow</h3>
+        <div class="flow">
+          <div class="flow-step">
+            <div class="step-node">1</div>
+            <div class="step-body">
+              <strong>Scheduler fires</strong>
+              <span>APScheduler triggers a scan cycle every N minutes</span>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="step-node">2</div>
+            <div class="step-body">
+              <strong>Sources polled</strong>
+              <span>Reddit via PRAW, web sources via requests + BeautifulSoup</span>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="step-node">3</div>
+            <div class="step-body">
+              <strong>Keyword filter applied</strong>
+              <span>Listings checked against configured include/exclude terms</span>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="step-node">4</div>
+            <div class="step-body">
+              <strong>Deduplication check</strong>
+              <span>Post ID looked up in SQLite — skip if already sent</span>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="step-node">5</div>
+            <div class="step-body">
+              <strong>Telegram alert dispatched</strong>
+              <span>Structured message sent to user's chat with full details</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: feed simulation -->
+    <div class="feed-panel">
+      <div class="feed-label">Live demo — configure and scan</div>
+
+      <div class="config-bar">
+        <div class="config-row">
+          <span class="config-label">keywords</span>
+          <input class="config-input" id="kw-input" type="text" placeholder="e.g. Python, Django, remote" value="Python, Django" />
+        </div>
+        <div class="config-row">
+          <span class="config-label">source</span>
+          <select class="config-select" id="src-select">
+            <option value="all">All sources</option>
+            <option value="reddit">Reddit only</option>
+            <option value="web">Web boards only</option>
+          </select>
+        </div>
+        <button class="scan-btn" id="scan-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Run scan
+        </button>
+      </div>
+
+      <div class="feed-window">
+        <div class="feed-toolbar">
+          <span class="feed-toolbar-left" id="feed-status">waiting for scan</span>
+          <span class="feed-count" id="feed-count"></span>
+        </div>
+        <div class="feed-list" id="feed-list">
+          <div class="feed-empty" id="feed-empty">
+            <span>No results yet.</span>
+            <span class="empty-hint">Configure keywords above and press Run scan.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tg-preview">
+        <div class="tg-preview-header">Telegram alert preview</div>
+        <div class="tg-message" id="tg-preview">
+          <span class="tg-empty">A preview of the Telegram message will appear here after scanning.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+  (function () {
+
+    var jobPool = [
+      {
+        title: 'Senior Python Developer — Remote',
+        company: 'Syntax Labs',
+        location: 'Remote / Worldwide',
+        salary: '$80k–$110k',
+        source: 'reddit',
+        sub: 'r/forhire',
+        snippet: 'Looking for an experienced Python developer to lead backend services for a SaaS product. Strong Django and PostgreSQL skills required.',
+        age: '6m ago',
+        url: 'https://reddit.com/r/forhire',
+      },
+      {
+        title: 'Django Backend Engineer',
+        company: 'Clearpath Systems',
+        location: 'Remote (EU/Africa)',
+        salary: 'KES 180k–250k/mo',
+        source: 'web',
+        sub: 'RemoteOK',
+        snippet: 'Full ownership of API design and Django REST framework services. PostgreSQL, Redis, and Docker experience preferred.',
+        age: '12m ago',
+        url: 'https://remoteok.com',
+      },
+      {
+        title: '[Hiring] Python Automation Engineer',
+        company: 'AutoFlow Inc.',
+        location: 'Remote',
+        salary: 'Negotiable',
+        source: 'reddit',
+        sub: 'r/remotework',
+        snippet: 'We need someone to build and maintain data pipelines, scraping tools, and internal automation scripts using Python.',
+        age: '28m ago',
+        url: 'https://reddit.com/r/remotework',
+      },
+      {
+        title: 'Full-Stack Web Developer (Django + React)',
+        company: 'Meridian Digital',
+        location: 'Nairobi / Remote',
+        salary: 'KES 120k–160k/mo',
+        source: 'web',
+        sub: 'We Work Remotely',
+        snippet: 'Building internal tools for a logistics company. Django backend, React or vanilla JS frontend. Good communication required.',
+        age: '45m ago',
+        url: 'https://weworkremotely.com',
+      },
+      {
+        title: 'DevOps / Python Engineer Wanted',
+        company: 'Stackframe',
+        location: 'Remote',
+        salary: '$60k–$90k',
+        source: 'reddit',
+        sub: 'r/devops',
+        snippet: 'Looking for someone who can write Python tooling and maintain CI/CD infrastructure. Terraform and AWS a plus.',
+        age: '1h ago',
+        url: 'https://reddit.com/r/devops',
+      },
+      {
+        title: 'Python Developer for Telegram Bot Project',
+        company: 'Freelance / Contract',
+        location: 'Remote',
+        salary: '$500–$1,500 fixed',
+        source: 'reddit',
+        sub: 'r/forhire',
+        snippet: 'Short-term contract to build a Telegram bot for subscription management. Python, python-telegram-bot, and Mpesa integration required.',
+        age: '2h ago',
+        url: 'https://reddit.com/r/forhire',
+      },
+    ];
+
+    var scanBtn = document.getElementById('scan-btn');
+    var feedList = document.getElementById('feed-list');
+    var feedEmpty = document.getElementById('feed-empty');
+    var feedStatus = document.getElementById('feed-status');
+    var feedCount = document.getElementById('feed-count');
+    var tgPreview = document.getElementById('tg-preview');
+    var kwInput = document.getElementById('kw-input');
+    var srcSelect = document.getElementById('src-select');
+
+    var scanning = false;
+
+    function getKeywords() {
+      return kwInput.value.split(',').map(function (k) { return k.trim().toLowerCase(); }).filter(Boolean);
+    }
+
+    function matchesKeywords(job, kws) {
+      if (!kws.length) return true;
+      var text = (job.title + ' ' + job.snippet + ' ' + job.company).toLowerCase();
+      return kws.some(function (k) { return text.includes(k); });
+    }
+
+    function matchesSource(job, src) {
+      if (src === 'all') return true;
+      if (src === 'reddit') return job.source === 'reddit';
+      if (src === 'web') return job.source === 'web';
+      return true;
+    }
+
+    function sourceBadge(job) {
+      if (job.source === 'reddit') {
+        return '<span class="src-badge src-reddit">' + job.sub + '</span>';
+      }
+      return '<span class="src-badge src-web">' + job.sub + '</span>';
+    }
+
+    function renderTgPreview(job) {
+      tgPreview.innerHTML =
+        '<div class="tg-title">' + job.title + '</div>' +
+        '<div style="margin-bottom:0.5rem;">' +
+        '<span class="tg-field">Company:</span> ' + job.company + '<br>' +
+        '<span class="tg-field">Location:</span> ' + job.location + '<br>' +
+        '<span class="tg-field">Salary:</span> ' + job.salary + '<br>' +
+        '<span class="tg-field">Source:</span> ' + job.sub +
+        '</div>' +
+        '<div style="margin-bottom:0.5rem;font-size:0.8rem;color:var(--text-secondary)">' + job.snippet + '</div>' +
+        '<span class="tg-link">' + job.url + '</span>' +
+        '<div style="margin-top:0.4rem;font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted)">' + job.age + ' · sent to Telegram</div>';
+    }
+
+    function runScan() {
+      if (scanning) return;
+      scanning = true;
+      scanBtn.disabled = true;
+      scanBtn.textContent = 'Scanning...';
+
+      var kws = getKeywords();
+      var src = srcSelect.value;
+
+      // clear old results
+      feedList.innerHTML = '';
+      feedCount.textContent = '';
+      feedStatus.textContent = 'scanning sources...';
+
+      var scanRow = document.createElement('div');
+      scanRow.className = 'scanning-row';
+      scanRow.innerHTML = '<div class="scan-spinner"></div><span id="scan-msg">connecting to sources...</span>';
+      feedList.appendChild(scanRow);
+
+      var msgs = [
+        'polling Reddit via PRAW...',
+        'fetching RemoteOK feed...',
+        'scraping We Work Remotely...',
+        'applying keyword filter...',
+        'running deduplication check...',
+      ];
+
+      var msgEl = document.getElementById('scan-msg');
+      var i = 0;
+      var msgInterval = setInterval(function () {
+        if (i < msgs.length) {
+          if (msgEl) msgEl.textContent = msgs[i];
+          i++;
+        } else {
+          clearInterval(msgInterval);
+        }
+      }, 420);
+
+      setTimeout(function () {
+        clearInterval(msgInterval);
+        feedList.innerHTML = '';
+
+        var matches = jobPool.filter(function (j) {
+          return matchesKeywords(j, kws) && matchesSource(j, src);
+        });
+
+        if (!matches.length) {
+          feedList.innerHTML = '';
+          var empty = document.createElement('div');
+          empty.className = 'feed-empty';
+          empty.innerHTML = '<span>No matches found.</span><span class="empty-hint">Try different keywords or a broader source filter.</span>';
+          feedList.appendChild(empty);
+          feedStatus.textContent = 'scan complete — 0 matches';
+          feedCount.textContent = '';
+        } else {
+          feedStatus.textContent = 'scan complete';
+          feedCount.textContent = matches.length + ' match' + (matches.length > 1 ? 'es' : '');
+
+          matches.forEach(function (job, idx) {
+            setTimeout(function () {
+              var card = document.createElement('div');
+              card.className = 'job-card';
+              card.innerHTML =
+                '<div class="job-top">' +
+                  '<div class="job-title">' + job.title + '</div>' +
+                  '<div class="job-source-badge">' + sourceBadge(job) + '</div>' +
+                '</div>' +
+                '<div class="job-meta">' + job.company + ' &nbsp;·&nbsp; ' + job.location + ' &nbsp;·&nbsp; ' + job.salary + '</div>' +
+                '<div class="job-snippet">' + job.snippet + '</div>' +
+                '<div class="job-footer">' +
+                  '<a class="job-link" href="' + job.url + '" target="_blank" rel="noopener">view listing ↗</a>' +
+                  '<span class="sent-tag">sent to Telegram</span>' +
+                  '<span style="font-family:var(--font-mono);font-size:0.68rem;color:var(--text-muted)">' + job.age + '</span>' +
+                '</div>';
+
+              card.addEventListener('click', function () { renderTgPreview(job); });
+              feedList.appendChild(card);
+
+              if (idx === 0) renderTgPreview(job);
+            }, idx * 140);
+          });
+        }
+
+        scanning = false;
+        scanBtn.disabled = false;
+        scanBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Run scan';
+      }, 2400);
+    }
+
+    scanBtn.addEventListener('click', runScan);
+
+    kwInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') runScan();
+    });
+
+  })();
+  </script>
+
+</body>
+</html>

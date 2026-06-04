@@ -1,0 +1,936 @@
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscription Manager Bot — Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:               #0b0c0f;
+      --surface:          #14161a;
+      --surface-elevated: #1c1f24;
+      --surface-high:     #22262d;
+      --border:           #2a2d34;
+      --border-subtle:    #1e2128;
+      --text-primary:     #f0f2f5;
+      --text-secondary:   #9aa0ab;
+      --text-muted:       #555c68;
+      --accent:           #5b9bd5;
+      --accent-dim:       rgba(91,155,213,0.12);
+      --accent-border:    rgba(91,155,213,0.22);
+      --green:            #4ade80;
+      --green-dim:        rgba(74,222,128,0.10);
+      --green-border:     rgba(74,222,128,0.20);
+      --font-sans:        'Inter', system-ui, sans-serif;
+      --font-mono:        'JetBrains Mono', 'Courier New', monospace;
+      --radius:           10px;
+      --radius-sm:        6px;
+    }
+
+    html { background: var(--bg); }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- top bar ---- */
+    .topbar {
+      border-bottom: 1px solid var(--border);
+      padding: 0.9rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: rgba(11,12,15,0.92);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .back-link {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--text-secondary); }
+    .back-link svg { flex-shrink: 0; }
+
+    .topbar-divider {
+      width: 1px;
+      height: 16px;
+      background: var(--border);
+    }
+
+    .topbar-title {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--green);
+      background: var(--green-dim);
+      border: 1px solid var(--green-border);
+      padding: 0.22rem 0.7rem;
+      border-radius: 20px;
+    }
+    .status-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: blink-dot 2.2s ease-in-out infinite;
+    }
+    @keyframes blink-dot { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+    /* ---- layout ---- */
+    .page {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 3rem 2rem 5rem;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    /* ---- left panel ---- */
+    .meta h1 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      color: var(--text-primary);
+      margin-bottom: 0.9rem;
+    }
+
+    .meta .subtitle {
+      font-size: 0.98rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 540px;
+      margin-bottom: 2rem;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: #9ab8d8;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      padding: 0.2rem 0.65rem;
+      border-radius: 14px;
+    }
+
+    /* ---- feature list ---- */
+    .feature-block {
+      margin-bottom: 2.5rem;
+    }
+
+    .feature-block h3 {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      font-size: 0.93rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .feature-list li::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    /* ---- flow diagram ---- */
+    .flow-block h3 {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      position: relative;
+    }
+
+    .flow-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 30px;
+      width: 1px;
+      height: calc(100% + 2px);
+      background: var(--border);
+    }
+
+    .step-node {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface-elevated);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      flex-shrink: 0;
+      z-index: 1;
+      position: relative;
+    }
+
+    .step-body {
+      padding-bottom: 1.6rem;
+    }
+
+    .step-body strong {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.2rem;
+    }
+
+    .step-body span {
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+    }
+
+    /* ---- right panel: chat sim ---- */
+    .chat-panel {
+      position: sticky;
+      top: 5rem;
+    }
+
+    .chat-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.8rem;
+    }
+
+    .chat-window {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: var(--surface-elevated);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .chat-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .chat-avatar svg { color: var(--accent); }
+
+    .chat-header-info { flex: 1; }
+
+    .chat-header-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .chat-header-status {
+      font-size: 0.74rem;
+      color: var(--green);
+      font-family: var(--font-mono);
+    }
+
+    .chat-body {
+      height: 420px;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      scroll-behavior: smooth;
+    }
+
+    .chat-body::-webkit-scrollbar { width: 4px; }
+    .chat-body::-webkit-scrollbar-track { background: transparent; }
+    .chat-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .msg {
+      max-width: 82%;
+      padding: 0.6rem 0.9rem;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .msg-bot {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      align-self: flex-start;
+      border-bottom-left-radius: 3px;
+    }
+
+    .msg-user {
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      color: var(--text-primary);
+      align-self: flex-end;
+      border-bottom-right-radius: 3px;
+    }
+
+    .msg-time {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      margin-top: 0.15rem;
+    }
+
+    .msg-time.right { text-align: right; }
+
+    .msg code {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      background: rgba(255,255,255,0.06);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+    }
+
+    .msg .cmd {
+      font-family: var(--font-mono);
+      color: var(--accent);
+      font-size: 0.82rem;
+    }
+
+    .msg-keyboard {
+      align-self: flex-start;
+      max-width: 90%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .kb-btn {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.45rem 0.8rem;
+      font-size: 0.8rem;
+      color: var(--accent);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.15s, background 0.15s;
+      font-family: var(--font-sans);
+      width: 100%;
+    }
+
+    .kb-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0.55rem 0.9rem;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      border-bottom-left-radius: 3px;
+      align-self: flex-start;
+      width: fit-content;
+    }
+
+    .typing-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+    .typing-dot:nth-child(1) { animation: t 1.2s 0s infinite; }
+    .typing-dot:nth-child(2) { animation: t 1.2s 0.2s infinite; }
+    .typing-dot:nth-child(3) { animation: t 1.2s 0.4s infinite; }
+    @keyframes t { 0%,60%,100%{opacity:0.25;transform:translateY(0)} 30%{opacity:1;transform:translateY(-3px)} }
+
+    .chat-input-row {
+      border-top: 1px solid var(--border);
+      padding: 0.7rem 1rem;
+      display: flex;
+      gap: 0.6rem;
+      background: var(--surface);
+    }
+
+    .chat-input {
+      flex: 1;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.8rem;
+      font-size: 0.83rem;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .chat-input::placeholder { color: var(--text-muted); }
+    .chat-input:focus { border-color: var(--accent); }
+
+    .send-btn {
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.9rem;
+      color: #0b0c0f;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .send-btn:hover { background: #6da9e0; }
+
+    /* ---- quick commands ---- */
+    .quick-cmds {
+      margin-top: 0.8rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .quick-cmd {
+      font-family: var(--font-mono);
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      padding: 0.22rem 0.6rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .quick-cmd:hover { color: var(--accent); border-color: var(--accent-border); }
+
+    /* ---- responsive ---- */
+    @media (max-width: 780px) {
+      .page {
+        grid-template-columns: 1fr;
+        padding: 2rem 1.2rem 4rem;
+        gap: 2.5rem;
+      }
+      .chat-panel { position: static; }
+      .topbar { padding: 0.85rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="index.html" class="back-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        back to portfolio
+      </a>
+      <div class="topbar-divider"></div>
+      <span class="topbar-title">subscription-manager-bot / demo</span>
+    </div>
+    <div class="status-pill">
+      <span class="status-dot"></span>
+      simulation running
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- LEFT: meta + features -->
+    <div class="meta">
+      <h1>Telegram Subscription<br>Manager Bot</h1>
+      <p class="subtitle">
+        Automates the full lifecycle of paid Telegram channel access — from payment confirmation through to expiry and removal. Built for creators, communities, and businesses that sell gated content without wanting to manage subscribers manually.
+      </p>
+
+      <div class="tag-row">
+        <span class="tag">Python</span>
+        <span class="tag">python-telegram-bot</span>
+        <span class="tag">SQLite</span>
+        <span class="tag">M-Pesa API</span>
+        <span class="tag">Webhook</span>
+        <span class="tag">Cron Jobs</span>
+      </div>
+
+      <div class="feature-block">
+        <h3>What it handles</h3>
+        <ul class="feature-list">
+          <li>User sends /subscribe — bot responds with plan options and payment instructions</li>
+          <li>M-Pesa STK push is triggered; bot listens for the IPN callback to confirm payment</li>
+          <li>On confirmation, user is added to the private channel via invite link with expiry tracked in the database</li>
+          <li>Renewal reminders sent at 3 days and 1 day before expiry via scheduled jobs</li>
+          <li>Expired subscribers are removed automatically — no manual intervention required</li>
+          <li>Admin commands: view active subs, manually extend, revoke, or export a CSV report</li>
+          <li>All state is persisted in SQLite — portable and zero external dependencies</li>
+        </ul>
+      </div>
+
+      <div class="flow-block">
+        <h3>Execution flow</h3>
+        <div class="flow">
+          <div class="flow-step">
+            <div class="step-node">1</div>
+            <div class="step-body">
+              <strong>User sends /subscribe</strong>
+              <span>Bot presents plan tiers and pricing inline</span>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="step-node">2</div>
+            <div class="step-body">
+              <strong>M-Pesa STK push initiated</strong>
+              <span>User receives payment prompt on their phone</span>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="step-node">3</div>
+            <div class="step-body">
+              <strong>IPN callback received</strong>
+              <span>Bot verifies transaction ID and amount</span>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="step-node">4</div>
+            <div class="step-body">
+              <strong>Access granted</strong>
+              <span>User is sent a one-time invite link to the channel</span>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="step-node">5</div>
+            <div class="step-body">
+              <strong>Expiry handled automatically</strong>
+              <span>Reminders sent, then user removed on expiry date</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: chat simulation -->
+    <div class="chat-panel">
+      <div class="chat-label">Interactive demo — try the commands</div>
+      <div class="chat-window">
+        <div class="chat-header">
+          <div class="chat-avatar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="chat-header-info">
+            <div class="chat-header-name">SubscriptionBot</div>
+            <div class="chat-header-status">online</div>
+          </div>
+        </div>
+
+        <div class="chat-body" id="chat-body"></div>
+
+        <div class="chat-input-row">
+          <input class="chat-input" id="chat-input" type="text" placeholder="type a command or message..." autocomplete="off" />
+          <button class="send-btn" id="send-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            send
+          </button>
+        </div>
+      </div>
+
+      <div class="quick-cmds" id="quick-cmds">
+        <span class="quick-cmd" data-cmd="/start">/start</span>
+        <span class="quick-cmd" data-cmd="/subscribe">/subscribe</span>
+        <span class="quick-cmd" data-cmd="/status">/status</span>
+        <span class="quick-cmd" data-cmd="/renew">/renew</span>
+        <span class="quick-cmd" data-cmd="/help">/help</span>
+        <span class="quick-cmd" data-cmd="/admin">/admin</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+  (function () {
+    var body = document.getElementById('chat-body');
+    var input = document.getElementById('chat-input');
+    var sendBtn = document.getElementById('send-btn');
+
+    var now = function () {
+      var d = new Date();
+      return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+    };
+
+    var state = {
+      subscribing: false,
+      selectedPlan: null,
+      paymentPending: false,
+      subscribed: false,
+      subscriptionExpiry: null,
+      awaitingPhone: false,
+    };
+
+    var plans = {
+      '1': { name: 'Monthly', price: 'KES 500', days: 30 },
+      '2': { name: 'Quarterly', price: 'KES 1,200', days: 90 },
+      '3': { name: 'Annual', price: 'KES 4,000', days: 365 },
+    };
+
+    function addMsg(html, type, time) {
+      var wrap = document.createElement('div');
+
+      var msg = document.createElement('div');
+      msg.className = 'msg msg-' + type;
+      msg.innerHTML = html;
+
+      var t = document.createElement('div');
+      t.className = 'msg-time' + (type === 'user' ? ' right' : '');
+      t.textContent = time || now();
+
+      wrap.appendChild(msg);
+      wrap.appendChild(t);
+      body.appendChild(wrap);
+      body.scrollTop = body.scrollHeight;
+    }
+
+    function addKeyboard(buttons) {
+      var wrap = document.createElement('div');
+      wrap.className = 'msg-keyboard';
+      buttons.forEach(function (b) {
+        var btn = document.createElement('button');
+        btn.className = 'kb-btn';
+        btn.textContent = b.label;
+        btn.addEventListener('click', function () {
+          wrap.remove();
+          handleInput(b.value);
+        });
+        wrap.appendChild(btn);
+      });
+      body.appendChild(wrap);
+      body.scrollTop = body.scrollHeight;
+    }
+
+    function showTyping(cb, delay) {
+      var indicator = document.createElement('div');
+      indicator.className = 'typing-indicator';
+      indicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+      body.appendChild(indicator);
+      body.scrollTop = body.scrollHeight;
+      setTimeout(function () {
+        indicator.remove();
+        cb();
+        body.scrollTop = body.scrollHeight;
+      }, delay || 900);
+    }
+
+    function botReply(html, delay, kb) {
+      showTyping(function () {
+        addMsg(html, 'bot');
+        if (kb) addKeyboard(kb);
+      }, delay);
+    }
+
+    var responses = {
+      '/start': function () {
+        botReply(
+          'Hello. I manage subscriptions for private Telegram channels.<br><br>' +
+          'Use the commands below to subscribe, check your status, or renew your access.<br><br>' +
+          '<span class="cmd">/subscribe</span> — get access to a channel<br>' +
+          '<span class="cmd">/status</span> — view your current subscription<br>' +
+          '<span class="cmd">/renew</span> — extend before expiry<br>' +
+          '<span class="cmd">/help</span> — list all available commands',
+          750
+        );
+      },
+
+      '/subscribe': function () {
+        state.subscribing = true;
+        botReply(
+          'Select a subscription plan:',
+          700,
+          [
+            { label: 'Monthly — KES 500 (30 days)', value: 'plan_1' },
+            { label: 'Quarterly — KES 1,200 (90 days)', value: 'plan_2' },
+            { label: 'Annual — KES 4,000 (365 days)', value: 'plan_3' },
+          ]
+        );
+      },
+
+      'plan_1': function () { selectPlan('1'); },
+      'plan_2': function () { selectPlan('2'); },
+      'plan_3': function () { selectPlan('3'); },
+
+      '/status': function () {
+        if (state.subscribed && state.subscriptionExpiry) {
+          var d = state.subscriptionExpiry;
+          var diff = Math.ceil((d - Date.now()) / 86400000);
+          botReply(
+            'Your subscription is active.<br><br>' +
+            '<code>Plan:</code> ' + plans[state.selectedPlan].name + '<br>' +
+            '<code>Expires:</code> ' + d.toLocaleDateString('en-KE', {day:'2-digit',month:'short',year:'numeric'}) + '<br>' +
+            '<code>Days remaining:</code> ' + diff,
+            700
+          );
+        } else {
+          botReply(
+            'You do not have an active subscription.<br><br>' +
+            'Use <span class="cmd">/subscribe</span> to get access.',
+            700
+          );
+        }
+      },
+
+      '/renew': function () {
+        if (state.subscribed) {
+          botReply(
+            'Select a renewal plan. Your current access will be extended from the existing expiry date.',
+            700,
+            [
+              { label: 'Monthly — KES 500', value: 'plan_1' },
+              { label: 'Quarterly — KES 1,200', value: 'plan_2' },
+              { label: 'Annual — KES 4,000', value: 'plan_3' },
+            ]
+          );
+        } else {
+          botReply(
+            'No active subscription found. Use <span class="cmd">/subscribe</span> to start one.',
+            700
+          );
+        }
+      },
+
+      '/help': function () {
+        botReply(
+          '<code>/start</code> — introduction<br>' +
+          '<code>/subscribe</code> — purchase channel access<br>' +
+          '<code>/status</code> — view expiry and plan details<br>' +
+          '<code>/renew</code> — extend your subscription<br>' +
+          '<code>/admin</code> — admin panel (restricted)<br><br>' +
+          'For support, contact the channel administrator.',
+          750
+        );
+      },
+
+      '/admin': function () {
+        showTyping(function () {
+          addMsg('Checking authorisation...', 'bot');
+          showTyping(function () {
+            addMsg(
+              'Access denied. This command is restricted to registered administrators.<br><br>' +
+              'Admin functions include:<br>' +
+              '<code>/admin list</code> — active subscribers<br>' +
+              '<code>/admin extend [user] [days]</code> — manual extension<br>' +
+              '<code>/admin revoke [user]</code> — remove access<br>' +
+              '<code>/admin export</code> — download CSV report',
+              'bot'
+            );
+          }, 600);
+        }, 800);
+      },
+    };
+
+    function selectPlan(id) {
+      state.selectedPlan = id;
+      state.awaitingPhone = true;
+      var p = plans[id];
+      botReply(
+        'You selected the <strong>' + p.name + '</strong> plan at <strong>' + p.price + '</strong>.<br><br>' +
+        'Enter your M-Pesa phone number to receive the payment prompt.<br>' +
+        '<span style="font-size:0.78rem;color:var(--text-muted)">Format: 07XXXXXXXX or 254XXXXXXXXX</span>',
+        750
+      );
+    }
+
+    function processPayment(phone) {
+      state.awaitingPhone = false;
+      state.paymentPending = true;
+
+      showTyping(function () {
+        addMsg(
+          'Sending M-Pesa prompt to <code>' + phone + '</code>...',
+          'bot'
+        );
+
+        showTyping(function () {
+          addMsg(
+            'STK push sent. Enter your M-Pesa PIN on your phone to complete the payment.<br><br>' +
+            '<span style="font-size:0.78rem;color:var(--text-muted)">Waiting for confirmation — this usually takes under 30 seconds.</span>',
+            'bot'
+          );
+
+          // simulate payment confirmation
+          setTimeout(function () {
+            showTyping(function () {
+              var p = plans[state.selectedPlan];
+              var expiry = new Date(Date.now() + p.days * 86400000);
+              state.subscribed = true;
+              state.paymentPending = false;
+              state.subscriptionExpiry = expiry;
+
+              addMsg(
+                'Payment confirmed.<br><br>' +
+                '<code>Amount:</code> ' + p.price + '<br>' +
+                '<code>Plan:</code> ' + p.name + '<br>' +
+                '<code>Expires:</code> ' + expiry.toLocaleDateString('en-KE', {day:'2-digit',month:'short',year:'numeric'}) + '<br><br>' +
+                'You have been granted access. Your private invite link is below:<br>' +
+                '<span style="color:var(--accent);font-family:var(--font-mono);font-size:0.8rem">https://t.me/+xXXXXXXXXXXXXXXX</span><br><br>' +
+                '<span style="font-size:0.78rem;color:var(--text-muted)">This link is single-use and expires in 24 hours.</span>',
+                'bot'
+              );
+            }, 1000);
+          }, 3000);
+
+        }, 1200);
+      }, 900);
+    }
+
+    function handleInput(text) {
+      var cmd = text.trim();
+      if (!cmd) return;
+
+      addMsg(cmd, 'user');
+
+      if (state.awaitingPhone) {
+        var phoneRe = /^(07|01|254)\d{8,9}$/;
+        if (phoneRe.test(cmd.replace(/\s/g,''))) {
+          processPayment(cmd);
+        } else {
+          botReply('Invalid phone number format. Please enter a valid M-Pesa number (e.g. 0712345678).', 600);
+        }
+        return;
+      }
+
+      var handler = responses[cmd.toLowerCase()];
+      if (handler) {
+        handler();
+      } else {
+        botReply(
+          'Command not recognised: <code>' + cmd + '</code><br><br>' +
+          'Use <span class="cmd">/help</span> to see available commands.',
+          700
+        );
+      }
+    }
+
+    // quick command chips
+    document.getElementById('quick-cmds').addEventListener('click', function (e) {
+      var el = e.target.closest('.quick-cmd');
+      if (el) {
+        input.value = el.dataset.cmd;
+        input.focus();
+      }
+    });
+
+    sendBtn.addEventListener('click', function () {
+      var v = input.value;
+      input.value = '';
+      handleInput(v);
+    });
+
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        var v = input.value;
+        input.value = '';
+        handleInput(v);
+      }
+    });
+
+    // opening message
+    setTimeout(function () {
+      addMsg(
+        'Hello. Use <span class="cmd">/start</span> to begin or tap a command below.',
+        'bot',
+        now()
+      );
+    }, 400);
+
+  })();
+  </script>
+
+</body>
+</html>
