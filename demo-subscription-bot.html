@@ -531,7 +531,7 @@
     <div class="meta">
       <h1>Telegram Subscription<br>Manager Bot</h1>
       <p class="subtitle">
-        Automates the full lifecycle of paid Telegram channel access — from payment confirmation through to expiry and removal. Built for creators, communities, and businesses that sell gated content without wanting to manage subscribers manually.
+        Automates the full lifecycle of paid Telegram channel access from payment confirmation through to expiry and removal. Built for creators, communities, and businesses that sell gated content without wanting to manage subscribers manually.
       </p>
 
       <div class="tag-row">
@@ -546,13 +546,13 @@
       <div class="feature-block">
         <h3>What it handles</h3>
         <ul class="feature-list">
-          <li>User sends /subscribe — bot responds with plan options and payment instructions</li>
+          <li>User sends /subscribe bot responds with plan options and payment instructions</li>
           <li>M-Pesa STK push is triggered; bot listens for the IPN callback to confirm payment</li>
           <li>On confirmation, user is added to the private channel via invite link with expiry tracked in the database</li>
           <li>Renewal reminders sent at 3 days and 1 day before expiry via scheduled jobs</li>
-          <li>Expired subscribers are removed automatically — no manual intervention required</li>
+          <li>Expired subscribers are removed automatically no manual intervention required</li>
           <li>Admin commands: view active subs, manually extend, revoke, or export a CSV report</li>
-          <li>All state is persisted in SQLite — portable and zero external dependencies</li>
+          <li>All state is persisted in SQLite portable and zero external dependencies</li>
         </ul>
       </div>
 
@@ -584,7 +584,7 @@
             <div class="step-node">4</div>
             <div class="step-body">
               <strong>Access granted</strong>
-              <span>User is sent a one-time invite link to the channel</span>
+              <span>User is sent a one time invite link to the channel</span>
             </div>
           </div>
           <div class="flow-step">
@@ -600,7 +600,7 @@
 
     <!-- RIGHT: chat simulation -->
     <div class="chat-panel">
-      <div class="chat-label">Interactive demo — try the commands</div>
+      <div class="chat-label">Interactive demo try the commands</div>
       <div class="chat-window">
         <div class="chat-header">
           <div class="chat-avatar">
@@ -720,10 +720,10 @@
         botReply(
           'Hello. I manage subscriptions for private Telegram channels.<br><br>' +
           'Use the commands below to subscribe, check your status, or renew your access.<br><br>' +
-          '<span class="cmd">/subscribe</span> — get access to a channel<br>' +
-          '<span class="cmd">/status</span> — view your current subscription<br>' +
-          '<span class="cmd">/renew</span> — extend before expiry<br>' +
-          '<span class="cmd">/help</span> — list all available commands',
+          '<span class="cmd">/subscribe</span> -get access to a channel<br>' +
+          '<span class="cmd">/status</span> -view your current subscription<br>' +
+          '<span class="cmd">/renew</span> -extend before expiry<br>' +
+          '<span class="cmd">/help</span> -list all available commands',
           750
         );
       },
@@ -734,9 +734,9 @@
           'Select a subscription plan:',
           700,
           [
-            { label: 'Monthly — KES 500 (30 days)', value: 'plan_1' },
-            { label: 'Quarterly — KES 1,200 (90 days)', value: 'plan_2' },
-            { label: 'Annual — KES 4,000 (365 days)', value: 'plan_3' },
+            { label: 'Monthly - KES 500 (30 days)', value: 'plan_1' },
+            { label: 'Quarterly - KES 1,200 (90 days)', value: 'plan_2' },
+            { label: 'Annual - KES 4,000 (365 days)', value: 'plan_3' },
           ]
         );
       },
@@ -771,9 +771,9 @@
             'Select a renewal plan. Your current access will be extended from the existing expiry date.',
             700,
             [
-              { label: 'Monthly — KES 500', value: 'plan_1' },
-              { label: 'Quarterly — KES 1,200', value: 'plan_2' },
-              { label: 'Annual — KES 4,000', value: 'plan_3' },
+              { label: 'Monthly - KES 500', value: 'plan_1' },
+              { label: 'Quarterly - KES 1,200', value: 'plan_2' },
+              { label: 'Annual - KES 4,000', value: 'plan_3' },
             ]
           );
         } else {
@@ -786,11 +786,11 @@
 
       '/help': function () {
         botReply(
-          '<code>/start</code> — introduction<br>' +
-          '<code>/subscribe</code> — purchase channel access<br>' +
-          '<code>/status</code> — view expiry and plan details<br>' +
-          '<code>/renew</code> — extend your subscription<br>' +
-          '<code>/admin</code> — admin panel (restricted)<br><br>' +
+          '<code>/start</code> - introduction<br>' +
+          '<code>/subscribe</code> - purchase channel access<br>' +
+          '<code>/status</code> - view expiry and plan details<br>' +
+          '<code>/renew</code> - extend your subscription<br>' +
+          '<code>/admin</code> - admin panel (restricted)<br><br>' +
           'For support, contact the channel administrator.',
           750
         );
@@ -803,10 +803,10 @@
             addMsg(
               'Access denied. This command is restricted to registered administrators.<br><br>' +
               'Admin functions include:<br>' +
-              '<code>/admin list</code> — active subscribers<br>' +
-              '<code>/admin extend [user] [days]</code> — manual extension<br>' +
-              '<code>/admin revoke [user]</code> — remove access<br>' +
-              '<code>/admin export</code> — download CSV report',
+              '<code>/admin list</code> - active subscribers<br>' +
+              '<code>/admin extend [user] [days]</code> - manual extension<br>' +
+              '<code>/admin revoke [user]</code> - remove access<br>' +
+              '<code>/admin export</code> - download CSV report',
               'bot'
             );
           }, 600);
@@ -839,7 +839,7 @@
         showTyping(function () {
           addMsg(
             'STK push sent. Enter your M-Pesa PIN on your phone to complete the payment.<br><br>' +
-            '<span style="font-size:0.78rem;color:var(--text-muted)">Waiting for confirmation — this usually takes under 30 seconds.</span>',
+            '<span style="font-size:0.78rem;color:var(--text-muted)">Waiting for confirmation this usually takes under 30 seconds.</span>',
             'bot'
           );
 

@@ -567,7 +567,7 @@
     <div class="meta">
       <h1>Job Hunter Bot</h1>
       <p class="subtitle">
-        Monitors job listings across target websites and Reddit in real time. When a post matches your configured keywords, it sends a structured alert directly to your Telegram — title, source, link, salary if available, and time posted. No inbox noise, no missed opportunities.
+        Monitors job listings across target websites and Reddit in real time. When a post matches your configured keywords, it sends a structured alert directly to your Telegram  title, source, link, salary if available, and time posted. No inbox noise, no missed opportunities.
       </p>
 
       <div class="tag-row">
@@ -584,10 +584,10 @@
         <h3>What it does</h3>
         <ul class="feature-list">
           <li>Polls configured job boards and subreddits on a user-defined schedule (default: every 15 minutes)</li>
-          <li>Deduplicates results against a local SQLite store — each listing is only sent once</li>
+          <li>Deduplicates results against a local SQLite store each listing is only sent once</li>
           <li>Keyword matching supports phrases, AND/OR logic, and exclusion terms</li>
           <li>Sends a formatted Telegram message per match: title, company, location, salary, source, and direct link</li>
-          <li>Tracks which listings were sent and when — queryable via bot commands</li>
+          <li>Tracks which listings were sent and when queryable via bot commands</li>
           <li>Commands to pause, resume, update keywords, and list recent matches without editing config files</li>
           <li>Runs as a background process on any Linux server or VPS with minimal resource usage</li>
         </ul>
@@ -731,7 +731,7 @@
 
     var jobPool = [
       {
-        title: 'Senior Python Developer — Remote',
+        title: 'Senior Python Developer Remote',
         company: 'Syntax Labs',
         location: 'Remote / Worldwide',
         salary: '$80k–$110k',
@@ -745,7 +745,7 @@
         title: 'Django Backend Engineer',
         company: 'Clearpath Systems',
         location: 'Remote (EU/Africa)',
-        salary: 'KES 180k–250k/mo',
+        salary: 'KES 180k-250k/mo',
         source: 'web',
         sub: 'RemoteOK',
         snippet: 'Full ownership of API design and Django REST framework services. PostgreSQL, Redis, and Docker experience preferred.',
@@ -767,7 +767,7 @@
         title: 'Full-Stack Web Developer (Django + React)',
         company: 'Meridian Digital',
         location: 'Nairobi / Remote',
-        salary: 'KES 120k–160k/mo',
+        salary: 'KES 120k-160k/mo',
         source: 'web',
         sub: 'We Work Remotely',
         snippet: 'Building internal tools for a logistics company. Django backend, React or vanilla JS frontend. Good communication required.',
@@ -778,7 +778,7 @@
         title: 'DevOps / Python Engineer Wanted',
         company: 'Stackframe',
         location: 'Remote',
-        salary: '$60k–$90k',
+        salary: '$60k-$90k',
         source: 'reddit',
         sub: 'r/devops',
         snippet: 'Looking for someone who can write Python tooling and maintain CI/CD infrastructure. Terraform and AWS a plus.',
@@ -789,10 +789,10 @@
         title: 'Python Developer for Telegram Bot Project',
         company: 'Freelance / Contract',
         location: 'Remote',
-        salary: '$500–$1,500 fixed',
+        salary: '$500-$1,500 fixed',
         source: 'reddit',
         sub: 'r/forhire',
-        snippet: 'Short-term contract to build a Telegram bot for subscription management. Python, python-telegram-bot, and Mpesa integration required.',
+        snippet: 'Short term contract to build a Telegram bot for subscription management. Python, python-telegram-bot, and Mpesa integration required.',
         age: '2h ago',
         url: 'https://reddit.com/r/forhire',
       },
@@ -899,7 +899,7 @@
           empty.className = 'feed-empty';
           empty.innerHTML = '<span>No matches found.</span><span class="empty-hint">Try different keywords or a broader source filter.</span>';
           feedList.appendChild(empty);
-          feedStatus.textContent = 'scan complete — 0 matches';
+          feedStatus.textContent = 'scan complete - 0 matches';
           feedCount.textContent = '';
         } else {
           feedStatus.textContent = 'scan complete';
