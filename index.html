@@ -5,6 +5,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -105,7 +106,55 @@
       padding: 1.5rem 0; width: 100%; border-bottom: 1px solid var(--border);
     }
 
-    .logo { font-family: var(--font-mono); font-size: 1.2rem; color: var(--text-primary); letter-spacing: -0.5px; }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface-elevated);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo:hover .logo-mark {
+      border-color: var(--accent);
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      line-height: 1;
+    }
+
+    .logo-name {
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .logo-stack {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      color: var(--text-muted);
+      letter-spacing: 0.01em;
+      margin-top: 0.18rem;
+    }
 
     .nav-links { display: flex; gap: 2.2rem; list-style: none; }
 
@@ -293,13 +342,13 @@
     hr { border-color: var(--border); margin: 1rem 0; }
     footer { color: var(--text-muted); font-size: 0.85rem; text-align: center; margin-top: 2rem; }
 
-    /* ----- Mobile menu toggle ----- */
     .menu-toggle {
       display: none; background: none; border: 1px solid var(--border);
-      color: var(--text-primary); padding: 0.4rem 0.8rem;
-      border-radius: 8px; font-family: var(--font-mono); font-size: 0.85rem;
-      cursor: pointer;
+      color: var(--text-secondary); padding: 0.45rem 0.55rem;
+      border-radius: 8px; cursor: pointer; line-height: 0;
+      transition: border-color var(--transition), color var(--transition);
     }
+    .menu-toggle:hover { border-color: var(--accent); color: var(--text-primary); }
 
     /* ----- Responsive ----- */
     @media (max-width: 700px) {
@@ -328,8 +377,26 @@
   <div class="container">
     <!-- Navigation -->
     <nav>
-      <div class="logo">john@davies:~$</div>
-      <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰ menu</button>
+      <a href="#hero" class="logo">
+        <div class="logo-mark">
+          <!-- cloud with upward arrow — infra/cloud engineer mark -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5b9bd5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 12v7M9 16l3-3 3 3"/>
+            <path d="M17.5 19a4.5 4.5 0 1 0-1.44-8.76A6 6 0 1 0 6 15.93"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-name">John Davies</span>
+          <span class="logo-stack">fullstack · cloud · automation</span>
+        </div>
+      </a>
+      <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
       <ul class="nav-links" id="nav-links">
         <li><a href="#about" class="nav-link">about</a></li>
         <li><a href="#services" class="nav-link">services</a></li>
